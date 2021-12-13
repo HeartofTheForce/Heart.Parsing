@@ -106,7 +106,7 @@ Recursive descent parsing using a pattern tree, recursion is handled by key-base
 
 ## Operator Precedence Parsing
 Uses a modified Shunting-yard algorithm to parse precedence\
-Operators are considered in a given parsing step using their nullable left/right precedences
+Operators are considered in a given parsing step based on their nullable left & right precedence
   - Nullary (null, null)
   - Prefix  (null, *)
   - Postfix (*, null)
