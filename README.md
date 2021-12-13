@@ -119,7 +119,7 @@ State is initialized to `WantOperand`\
 Parsing a Nullary operator will transition state from `WantOperand` -> `HaveOperand`\
 Parsing an Infix operator will transition state from `HaveOperand` -> `WantOperand`\
 Parsing a Prefix or Postfix operator will not cause a state transition allowing them to be chained\
-Operators match using an arbitrary `IPattern` which may contain a recursive `ExpressionPattern`, this is how parentheses, ternary and method call are handled
+Operators match using an arbitrary `IPattern` which may contain a recursive `ExpressionPattern`, this is how parentheses, ternary and method call operators are handled
 
 ## Nonsignificant patterns
 Whitespace and comments are handled using the reserved `_` rule name\
