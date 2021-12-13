@@ -86,6 +86,13 @@ namespace Heart.Parsing
                         SequencePattern.Create()
                             .Then(s_plainText)
                             .Discard(TerminalPattern.FromPlainText(":"))))
+                .Then(LookupPattern.Create("predicate"));
+
+            parser.Patterns["predicate"] = SequencePattern.Create()
+               .Then(QuantifierPattern.Optional(
+                    ChoicePattern.Create()
+                        .Or(TerminalPattern.FromPlainText("&"))
+                        .Or(TerminalPattern.FromPlainText("!"))))
                 .Then(LookupPattern.Create("quantifier"));
 
             parser.Patterns["quantifier"] = SequencePattern.Create()
@@ -171,7 +178,7 @@ namespace Heart.Parsing
         {
             var sequenceNode = (SequenceNode)node;
             var optional = (QuantifierNode)sequenceNode.Children[0];
-            var pattern = BuildQuantifier(sequenceNode.Children[1]);
+            var pattern = BuildPredicate(sequenceNode.Children[1]);
 
             if (optional.Children.Count == 0)
                 return pattern;
@@ -180,6 +187,24 @@ namespace Heart.Parsing
             string label = valueNode.Value[1..^1].Replace("''", "'");
 
             return LabelPattern.Create(label, pattern);
+        }
+
+        private static IPattern BuildPredicate(IParseNode node)
+        {
+            var sequenceNode = (SequenceNode)node;
+            var optional = (QuantifierNode)sequenceNode.Children[0];
+            var pattern = BuildQuantifier(sequenceNode.Children[1]);
+
+            if (optional.Children.Count == 0)
+                return pattern;
+
+            var choice = (ChoiceNode)optional.Children[0];
+            switch (choice.ChoiceIndex)
+            {
+                case 0: return PredicatePattern.Positive(pattern);
+                case 1: return PredicatePattern.Negative(pattern);
+                default: throw new NotImplementedException();
+            };
         }
 
         private static IPattern BuildQuantifier(IParseNode node)
