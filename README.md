@@ -94,8 +94,8 @@ expr ->
 ```
 # How it works
 ## Parsing Expression Grammars
-Recursive descent parsing using a pattern tree, recursion is handled by key-based lookups against `PatternParser.Patterns`\
-Implemented rules
+Recursive descent parsing using a pattern tree, recursion is handled by key-based lookups against `PatternParser.Patterns`
+### Implemented rules:
   - Sequence: e1 e2
   - Ordered choice: e1 / e2
   - Zero-or-more: e*
