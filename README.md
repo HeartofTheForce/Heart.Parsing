@@ -105,20 +105,27 @@ Recursive descent parsing using a pattern tree, recursion is handled by key-base
   - Not-predicate: !e
 
 ## Operator Precedence Parsing
-Uses a modified Shunting-yard algorithm to parse precedence\
-Operators are considered in a given parsing step based on their nullable left & right precedence
-  - Nullary (null, null)
-  - Prefix  (null, *)
-  - Postfix (*, null)
-  - Infix   (*, *)
+### Precedence
+  - Operators have 2 nullable precedences, `left?` and `right?`
+  - Operators with equal precedence are left associative
+  - By using asymmetric precedence, right associativity can be achieved
+  - Precedence is parsed using a modified Shunting-yard algorithm
 
-There are 2 states while parsing `WantOperand` and `HaveOperand`\
-Nullary/Prefix operators can be matched during `WantOperand`\
-Postfix/Infix operators can be matched during `HaveOperand`\
-State is initialized to `WantOperand`\
-Parsing a Nullary operator will transition state from `WantOperand` -> `HaveOperand`\
-Parsing an Infix operator will transition state from `HaveOperand` -> `WantOperand`\
-Parsing a Prefix or Postfix operator will not cause a state transition allowing them to be chained\
+### Operator Categories based on precedence
+  - `Nullary` (null, null)
+  - `Prefix` (null, *)
+  - `Postfix` (*, null)
+  - `Infix` (*, *)
+
+### Parsing States
+  - There are 2 states while parsing `WantOperand` and `HaveOperand`
+  - `Nullary`/`Prefix` operators can be matched during `WantOperand`
+  - `Postfix`/`Infix` operators can be matched during `HaveOperand`
+  - State is initialized to `WantOperand`
+  - Parsing a `Nullary` operator will transition state from `WantOperand` -> `HaveOperand`
+  - Parsing an `Infix` operator will transition state from `HaveOperand` -> `WantOperand`
+  - Parsing a `Prefix` or `Postfix` operator will not cause a state transition allowing them to be chained
+
 Operators match using an arbitrary `IPattern` which may contain a recursive `ExpressionPattern`, this is how parentheses, ternary and method call operators are handled
 
 ## Nonsignificant patterns
