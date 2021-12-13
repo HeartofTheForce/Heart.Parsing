@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Heart.Parsing;
 using Heart.Parsing.Patterns;
 
-namespace Heart.Tests
+namespace Heart.Parsing
 {
     public static class StringCompiler
     {
