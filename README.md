@@ -88,9 +88,13 @@ expr ->
         '!'          2    none '!'
     ]
 ```
+## Postfix Notation Output
+```
+[ (+ a (* b c)) ]
+```
 # How it works
 ## Parsing Expression Grammars
-Recursive descent parsing using a pattern tree, recursion is handled by key-based lookups against `PatternParser.Patterns`  
+Recursive descent parsing using a pattern tree, recursion is handled by key-based lookups against `PatternParser.Patterns`\
 Implemented rules
   - Sequence: e1 e2
   - Ordered choice: e1 / e2
@@ -101,19 +105,19 @@ Implemented rules
   - Not-predicate: !e
 
 ## Operator Precedence Parsing
-Uses a modified Shunting-yard algorithm to parse precedence  
+Uses a modified Shunting-yard algorithm to parse precedence\
 Operators are considered in a given parsing step using their nullable left/right precedences
   - Nullary (null, null)
   - Prefix  (null, *)
   - Postfix (*, null)
   - Infix   (*, *)
 
-Nullary/Prefix operators are allowed in situations where an operand is expected (WantOperand)  
-Postfix/Infix operators are allowed in situations where an operand has been found and not yet consumed (HaveOperand)  
+Nullary/Prefix operators are allowed in situations where an operand is expected (WantOperand)\
+Postfix/Infix operators are allowed in situations where an operand has been found and not yet consumed (HaveOperand)\
 Operators match using can be an arbitrary `IPattern` which may contain a recursive `ExpressionPattern`, this is how ternary, method call and parentheses are handled
 
 ## Nonsignificant patterns
-Whitespace and comments are handled using the reserved `_` rule name  
+Whitespace and comments are handled using the reserved `_` rule name\
 It is implicitly inserted between and only inbetween any sequence of terminal matches (`SequencePattern`, `QuantifierPattern`, `ExpressionPattern`)
 
 # Further Reading
