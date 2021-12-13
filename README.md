@@ -1,4 +1,4 @@
-# Heart.Parsing
+****# Heart.Parsing
 Pattern based string parsing
 
 # Functionality
@@ -112,13 +112,18 @@ Operators are considered in a given parsing step based on their nullable left & 
   - Postfix (*, null)
   - Infix   (*, *)
 
-Nullary/Prefix operators are allowed in situations where an operand is expected (WantOperand)\
-Postfix/Infix operators are allowed in situations where an operand has been found and not yet consumed (HaveOperand)\
-Operators match using can be an arbitrary `IPattern` which may contain a recursive `ExpressionPattern`, this is how ternary, method call and parentheses are handled
+There are 2 states while parsing `WantOperand` and `HaveOperand`\
+Nullary/Prefix operators can be matched during `WantOperand`\
+Postfix/Infix operators can be matched during `HaveOperand`\
+State is initialized to `WantOperand`\
+Parsing a Nullary operator will transition state from `WantOperand` -> `HaveOperand`\
+Parsing an Infix operator will transition state from `HaveOperand` -> `WantOperand`\
+Parsing a Prefix or Postfix operator will not cause a state transition allowing them to be chained\
+Operators match using an arbitrary `IPattern` which may contain a recursive `ExpressionPattern`, this is how parentheses, ternary and method call are handled
 
 ## Nonsignificant patterns
 Whitespace and comments are handled using the reserved `_` rule name\
-It is implicitly inserted between and only inbetween any sequence of terminal matches (`SequencePattern`, `QuantifierPattern`, `ExpressionPattern`)
+It is implicitly inserted between and only between any sequence of terminal matches (`SequencePattern`, `QuantifierPattern`, `ExpressionPattern`)
 
 # Further Reading
 ## Parsing Expression Grammars
