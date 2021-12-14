@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Heart.Parsing.Patterns
 {
     public class LabelPattern : IPattern
@@ -38,6 +40,11 @@ namespace Heart.Parsing.Patterns
             TextOffset = node.TextOffset;
             Label = label;
             Node = node;
+        }
+
+        public IEnumerable<IParseNode> GetChildren()
+        {
+            yield return Node;
         }
     }
 }

@@ -48,5 +48,10 @@ namespace Heart.Parsing.Patterns
             ChoiceIndex = choiceIndex;
             Node = node;
         }
+
+        public IEnumerable<IParseNode> GetChildren()
+        {
+            yield return Node;
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Heart.Parsing.Patterns
 {
     public class PredicatePattern : IPattern
@@ -44,6 +46,12 @@ namespace Heart.Parsing.Patterns
         {
             TextOffset = textOffset;
             Node = node;
+        }
+
+        public IEnumerable<IParseNode> GetChildren()
+        {
+            if (Node != null)
+                yield return Node;
         }
     }
 }

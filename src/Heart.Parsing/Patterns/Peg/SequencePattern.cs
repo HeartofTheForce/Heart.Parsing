@@ -87,5 +87,10 @@ namespace Heart.Parsing.Patterns
             TextOffset = textOffset;
             Children = children;
         }
+
+        public IEnumerable<IParseNode> GetChildren()
+        {
+            return Children;
+        }
     }
 }

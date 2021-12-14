@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Heart.Parsing.Patterns
 {
@@ -63,6 +65,8 @@ namespace Heart.Parsing.Patterns
             TextOffset = textOffset;
             Value = value;
         }
+
+        public IEnumerable<IParseNode> GetChildren() => Enumerable.Empty<IParseNode>();
     }
 
     public class UnexpectedTokenException : PatternException

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Heart.Parsing.Patterns
 {
     public class ExpressionNode : IParseNode
@@ -21,6 +23,17 @@ namespace Heart.Parsing.Patterns
                 TextOffset = leftNode.TextOffset;
             else
                 TextOffset = midNode.TextOffset;
+        }
+
+        public IEnumerable<IParseNode> GetChildren()
+        {
+            if (LeftNode != null)
+                yield return LeftNode;
+
+            yield return MidNode;
+
+            if (RightNode != null)
+                yield return RightNode;
         }
     }
 }

@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Heart.Parsing.Patterns;
 
 namespace Heart.Parsing
 {
     public static class ParseNodeHelper
     {
-        public static List<T> GetChildrenRecursive<T>(IParseNode node)
+        public static List<T> FindChildren<T>(this IParseNode node)
         {
             var output = new List<T>();
 
             var nodeStack = new Stack<IParseNode>();
-            foreach (var child in GetChildren(node).Reverse())
+            foreach (var child in node.GetChildren().Reverse())
             {
                 nodeStack.Push(child);
             }
@@ -26,45 +25,13 @@ namespace Heart.Parsing
                     continue;
                 }
 
-                foreach (var child in GetChildren(current).Reverse())
+                foreach (var child in current.GetChildren().Reverse())
                 {
                     nodeStack.Push(child);
                 }
             }
 
             return output;
-        }
-
-        public static IEnumerable<IParseNode> GetChildren(IParseNode node)
-        {
-            switch (node)
-            {
-                case ValueNode _:
-                    return Enumerable.Empty<IParseNode>();
-                case ChoiceNode choiceNode:
-                    return Enumerable.Repeat(choiceNode.Node, 1);
-                case LabelNode labelNode:
-                    return Enumerable.Repeat(labelNode.Node, 1);
-                case SequenceNode sequenceNode:
-                    return sequenceNode.Children;
-                case QuantifierNode quantifierNode:
-                    return quantifierNode.Children;
-                case ExpressionNode expressionNode:
-                    {
-                        var output = new List<IParseNode>();
-
-                        if (expressionNode.LeftNode != null)
-                            output.Add(expressionNode.LeftNode);
-
-                        output.Add(expressionNode.MidNode);
-
-                        if (expressionNode.RightNode != null)
-                            output.Add(expressionNode.RightNode);
-
-                        return output;
-                    }
-                default: throw new NotImplementedException();
-            }
         }
     }
 }

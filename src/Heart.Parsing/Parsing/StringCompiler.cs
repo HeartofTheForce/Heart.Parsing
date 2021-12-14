@@ -46,11 +46,13 @@ namespace Heart.Parsing
                         if (s_overrideCompilers.TryGetValue(expressionNode.Key, out var compiler))
                             return compiler(expressionNode);
 
-                        IEnumerable<ExpressionNode> children = ParseNodeHelper.GetChildrenRecursive<ExpressionNode>(expressionNode);
+                        var children = expressionNode
+                            .FindChildren<ExpressionNode>()
+                            .Select(x => Compile(x));
 
                         if (children.Any())
                         {
-                            string parameters = string.Join(' ', children.Select(x => Compile(x)));
+                            string parameters = string.Join(' ', children);
                             return $"({expressionNode.Key} {parameters})";
                         }
 
@@ -62,7 +64,10 @@ namespace Heart.Parsing
                     }
                 default:
                     {
-                        var children = ParseNodeHelper.GetChildren(node).Select(x => Compile(x));
+                        var children = node
+                            .GetChildren()
+                            .Select(x => Compile(x));
+
                         return string.Join(' ', children);
                     }
             }
