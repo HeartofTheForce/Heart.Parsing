@@ -139,5 +139,4 @@ It is implicitly inserted between and only between any sequence of terminal matc
 ## Operator Precedence Parsing
   - https://en.wikipedia.org/wiki/Shunting-yard_algorithm
   - https://stackoverflow.com/questions/16380234/handling-extra-operators-in-shunting-yard/16392115#16392115
-  - https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
-  - https://matklad.github.io/2020/04/15/from-pratt-to-dijkstra.html
+  - https://github.com/matklad/minipratt
