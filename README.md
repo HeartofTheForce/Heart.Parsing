@@ -1,4 +1,4 @@
-****# Heart.Parsing
+# Heart.Parsing
 Pattern based string parsing
 
 # Functionality
