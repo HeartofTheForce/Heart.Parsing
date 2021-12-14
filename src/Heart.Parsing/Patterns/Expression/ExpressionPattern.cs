@@ -5,11 +5,24 @@ namespace Heart.Parsing.Patterns
 {
     public class ExpressionPattern : IPattern
     {
-        private readonly IEnumerable<OperatorInfo> _operators;
+        private readonly IEnumerable<OperatorInfo> _wantOperandOperators;
+        private readonly IEnumerable<OperatorInfo> _haveOperandOperators;
 
         public ExpressionPattern(IEnumerable<OperatorInfo> operators)
         {
-            _operators = operators;
+            var wantOperandOperators = new List<OperatorInfo>();
+            var haveOperandOperators = new List<OperatorInfo>();
+
+            foreach (var op in operators)
+            {
+                if (op.LeftPrecedence == null)
+                    wantOperandOperators.Add(op);
+                else
+                    haveOperandOperators.Add(op);
+            }
+
+            _wantOperandOperators = wantOperandOperators;
+            _haveOperandOperators = haveOperandOperators;
         }
 
         public static IParseNode Parse(PatternParser parser, ParserContext ctx)
@@ -62,23 +75,15 @@ namespace Heart.Parsing.Patterns
         private ExpressionNodeBuilder? TryGetNodeBuilder(bool wantOperand, PatternParser parser, ParserContext ctx)
         {
             int localOffset = ctx.Offset;
-            foreach (var op in _operators)
+
+            IEnumerable<OperatorInfo> operators;
+            if (wantOperand)
+                operators = _wantOperandOperators;
+            else
+                operators = _haveOperandOperators;
+
+            foreach (var op in operators)
             {
-                bool valid;
-                if (wantOperand)
-                {
-                    //Nullary, Prefix
-                    valid = op.LeftPrecedence == null;
-                }
-                else
-                {
-                    //Postfix, Infix
-                    valid = op.LeftPrecedence != null;
-                }
-
-                if (!valid)
-                    continue;
-
                 var result = op.Pattern.TryMatch(parser, ctx);
                 if (result != null)
                 {
