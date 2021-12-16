@@ -29,29 +29,10 @@ namespace Heart.Parsing.Patterns
                 var result = _patterns[i].TryMatch(parser, ctx);
 
                 if (result != null)
-                    return new ChoiceNode(i, result);
+                    return result;
             }
 
             return null;
-        }
-    }
-
-    public class ChoiceNode : IParseNode
-    {
-        public int TextOffset { get; }
-        public int ChoiceIndex { get; }
-        public IParseNode Node { get; }
-
-        public ChoiceNode(int choiceIndex, IParseNode node)
-        {
-            TextOffset = node.TextOffset;
-            ChoiceIndex = choiceIndex;
-            Node = node;
-        }
-
-        public IEnumerable<IParseNode> GetChildren()
-        {
-            yield return Node;
         }
     }
 }

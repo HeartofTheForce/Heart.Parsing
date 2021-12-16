@@ -26,8 +26,7 @@ namespace Heart.Parsing
             },
             ["boolean"] = (node) =>
             {
-                var choiceNode = (ChoiceNode)node.MidNode;
-                var valueNode = (ValueNode)choiceNode.Node;
+                var valueNode = (ValueNode)node.MidNode;
                 return valueNode.Value;
             },
             ["identifier"] = (node) =>

@@ -11,6 +11,11 @@ namespace Heart.Parsing
         private static readonly TerminalPattern s_plainText = TerminalPattern.FromRegex("'(?:''|[^'])*'");
         private static readonly TerminalPattern s_identifier = TerminalPattern.FromRegex("[_a-zA-Z]\\w*");
 
+        private static IPattern Label(this IPattern pattern, string label)
+        {
+            return LabelPattern.Create(label, pattern);
+        }
+
         public static PatternParser BuildPatternParser(string path)
         {
             string input = File.ReadAllText(path);
@@ -34,12 +39,12 @@ namespace Heart.Parsing
                 var ruleNameNode = (ValueNode)sequenceNode.Children[0];
                 string ruleName = ruleNameNode.Value;
 
-                var choiceNode = (ChoiceNode)sequenceNode.Children[1];
+                var labelNode = (LabelNode)sequenceNode.Children[1];
                 IPattern rulePattern;
-                switch (choiceNode.ChoiceIndex)
+                switch (labelNode.Label)
                 {
-                    case 0: rulePattern = BuildExpr(choiceNode.Node); break;
-                    case 1: rulePattern = BuildChoice(choiceNode.Node); break;
+                    case "expr": rulePattern = BuildExpr(labelNode.Node); break;
+                    case "choice": rulePattern = BuildChoice(labelNode.Node); break;
                     default: throw new NotImplementedException();
                 }
 
@@ -62,8 +67,8 @@ namespace Heart.Parsing
             parser.Patterns["rule"] = SequencePattern.Create()
                 .Then(LookupPattern.Create("rule_head"))
                 .Then(ChoicePattern.Create()
-                    .Or(LookupPattern.Create("expr"))
-                    .Or(LookupPattern.Create("choice")));
+                    .Or(LookupPattern.Create("expr").Label("expr"))
+                    .Or(LookupPattern.Create("choice").Label("choice")));
 
             parser.Patterns["rule_head"] = SequencePattern.Create()
                 .Then(s_identifier)
@@ -109,12 +114,14 @@ namespace Heart.Parsing
                 .Then(ChoicePattern.Create()
                     .Or(ChoicePattern.Create()
                         .Or(s_regex)
-                        .Or(s_plainText))
+                        .Or(s_plainText)
+                        .Label("terminal"))
                     .Or(SequencePattern.Create()
                         .Discard(TerminalPattern.FromPlainText("("))
                         .Then(LookupPattern.Create("choice"))
-                        .Discard(TerminalPattern.FromPlainText(")")))
-                    .Or(s_identifier));
+                        .Discard(TerminalPattern.FromPlainText(")"))
+                        .Label("parenthesis"))
+                    .Or(s_identifier.Label("lookup")));
 
             var digits = TerminalPattern.FromRegex("\\d+");
             var none = TerminalPattern.FromPlainText("none");
@@ -198,11 +205,11 @@ namespace Heart.Parsing
             if (optional.Children.Count == 0)
                 return pattern;
 
-            var choice = (ChoiceNode)optional.Children[0];
-            switch (choice.ChoiceIndex)
+            var valueNode = (ValueNode)optional.Children[0];
+            switch (valueNode.Value)
             {
-                case 0: return PredicatePattern.Positive(pattern);
-                case 1: return PredicatePattern.Negative(pattern);
+                case "&": return PredicatePattern.Positive(pattern);
+                case "!": return PredicatePattern.Negative(pattern);
                 default: throw new NotImplementedException();
             };
         }
@@ -216,45 +223,38 @@ namespace Heart.Parsing
             if (optional.Children.Count == 0)
                 return pattern;
 
-            var choice = (ChoiceNode)optional.Children[0];
-            switch (choice.ChoiceIndex)
+            var valueNode = (ValueNode)optional.Children[0];
+            switch (valueNode.Value)
             {
-                case 0: return QuantifierPattern.Optional(pattern);
-                case 1: return QuantifierPattern.MinOrMore(0, pattern);
-                case 2: return QuantifierPattern.MinOrMore(1, pattern);
+                case "?": return QuantifierPattern.Optional(pattern);
+                case "*": return QuantifierPattern.MinOrMore(0, pattern);
+                case "+": return QuantifierPattern.MinOrMore(1, pattern);
                 default: throw new NotImplementedException();
             };
         }
 
         private static IPattern BuildTerm(IParseNode node)
         {
-            var root = (ChoiceNode)node;
+            var root = (LabelNode)node;
 
-            switch (root.ChoiceIndex)
+            switch (root.Label)
             {
-                case 0:
+                case "terminal":
                     {
-                        var choiceNode = (ChoiceNode)root.Node;
-                        var valueNode = (ValueNode)choiceNode.Node;
+                        var valueNode = (ValueNode)root.Node;
+                        string pattern = valueNode.Value[1..^1];
 
-                        switch (choiceNode.ChoiceIndex)
-                        {
-                            case 0:
-                                {
-                                    string pattern = valueNode.Value[1..^1].Replace("``", "`");
-                                    return TerminalPattern.FromRegex(pattern);
-                                }
-                            case 1:
-                                {
-                                    string pattern = valueNode.Value[1..^1].Replace("''", "'");
-                                    return TerminalPattern.FromPlainText(pattern);
-                                }
-                            default: throw new NotImplementedException();
-                        }
+                        if (valueNode.Value.StartsWith('`'))
+                            return TerminalPattern.FromRegex(pattern);
+
+                        if (valueNode.Value.StartsWith('\''))
+                            return TerminalPattern.FromPlainText(pattern);
+
+                        throw new NotImplementedException();
                     };
-                case 1:
+                case "parenthesis":
                     return BuildChoice(root.Node);
-                case 2:
+                case "lookup":
                     {
                         var valueNode = (ValueNode)root.Node;
                         return LookupPattern.Create(valueNode.Value);
@@ -276,21 +276,19 @@ namespace Heart.Parsing
                 var keyNode = (ValueNode)headNode.Children[0];
                 string key = keyNode.Value[1..^1];
 
-                var leftNode = (ChoiceNode)headNode.Children[1];
-                uint? leftPrecedence = null;
-                if (leftNode.ChoiceIndex == 0)
-                {
-                    var valueNode = (ValueNode)leftNode.Node;
-                    leftPrecedence = uint.Parse(valueNode.Value);
-                }
+                var leftNode = (ValueNode)headNode.Children[1];
+                uint? leftPrecedence;
+                if (leftNode.Value == "none")
+                    leftPrecedence = null;
+                else
+                    leftPrecedence = uint.Parse(leftNode.Value);
 
-                var rightNode = (ChoiceNode)headNode.Children[2];
-                uint? rightPrecedence = null;
-                if (rightNode.ChoiceIndex == 0)
-                {
-                    var valueNode = (ValueNode)rightNode.Node;
-                    rightPrecedence = uint.Parse(valueNode.Value);
-                }
+                var rightNode = (ValueNode)headNode.Children[2];
+                uint? rightPrecedence;
+                if (rightNode.Value == "none")
+                    rightPrecedence = null;
+                else
+                    rightPrecedence = uint.Parse(rightNode.Value);
 
                 var patternNode = sequenceNode.Children[1];
                 var pattern = BuildChoice(patternNode);
