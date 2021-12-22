@@ -36,7 +36,8 @@ namespace Heart.Parsing
             {
                 var sequenceNode = (SequenceNode)child;
 
-                var ruleNameNode = (ValueNode)sequenceNode.Children[0];
+                var ruleHeadNode = (SequenceNode)sequenceNode.Children[0];
+                var ruleNameNode = (ValueNode)ruleHeadNode.Children[0];
                 string ruleName = ruleNameNode.Value;
 
                 var labelNode = (LabelNode)sequenceNode.Children[1];
@@ -47,6 +48,10 @@ namespace Heart.Parsing
                     case "choice": rulePattern = BuildChoice(labelNode.Node); break;
                     default: throw new NotImplementedException();
                 }
+
+                string? label = TryParseLabel(ruleHeadNode.Children[1]);
+                if (label != null)
+                    rulePattern = LabelPattern.Create(label, rulePattern);
 
                 output.Patterns[ruleName] = rulePattern;
             }
@@ -72,6 +77,7 @@ namespace Heart.Parsing
 
             parser.Patterns["rule_head"] = SequencePattern.Create()
                 .Then(s_identifier)
+                .Then(LookupPattern.Create("label"))
                 .Discard(TerminalPattern.FromPlainText("->"));
 
             parser.Patterns["choice"] = SequencePattern.Create()
@@ -84,14 +90,14 @@ namespace Heart.Parsing
 
             parser.Patterns["sequence"] = QuantifierPattern.MinOrMore(
                 1,
-               LookupPattern.Create("label"));
+                SequencePattern.Create()
+                    .Then(LookupPattern.Create("predicate"))
+                    .Then(LookupPattern.Create("label")));
 
-            parser.Patterns["label"] = SequencePattern.Create()
-                .Then(QuantifierPattern.Optional(
-                        SequencePattern.Create()
-                            .Then(s_plainText)
-                            .Discard(TerminalPattern.FromPlainText(":"))))
-                .Then(LookupPattern.Create("predicate"));
+            parser.Patterns["label"] = QuantifierPattern.Optional(
+                SequencePattern.Create()
+                    .Discard(TerminalPattern.FromPlainText(":"))
+                    .Then(s_plainText));
 
             parser.Patterns["predicate"] = SequencePattern.Create()
                .Then(QuantifierPattern.Optional(
@@ -146,6 +152,16 @@ namespace Heart.Parsing
             return parser;
         }
 
+        private static string? TryParseLabel(IParseNode node)
+        {
+            var optional = (QuantifierNode)node;
+            if (optional.Children.Count == 0)
+                return null;
+
+            var valueNode = (ValueNode)optional.Children[0];
+            return valueNode.Value[1..^1].Replace("''", "'");
+        }
+
         private static IPattern BuildChoice(IParseNode node)
         {
             var sequenceNode = (SequenceNode)node;
@@ -170,30 +186,26 @@ namespace Heart.Parsing
         {
             var quantifierNode = (QuantifierNode)node;
             if (quantifierNode.Children.Count == 1)
-                return BuildLabel(quantifierNode.Children[0]);
+                return BuildSequenceStep(quantifierNode.Children[0]);
 
             var output = SequencePattern.Create();
             foreach (var child in quantifierNode.Children)
             {
-                output.Then(BuildLabel(child));
+                output.Then(BuildSequenceStep(child));
             }
 
             return output;
         }
 
-        private static IPattern BuildLabel(IParseNode node)
+        private static IPattern BuildSequenceStep(IParseNode node)
         {
             var sequenceNode = (SequenceNode)node;
-            var optional = (QuantifierNode)sequenceNode.Children[0];
-            var pattern = BuildPredicate(sequenceNode.Children[1]);
+            var pattern = BuildPredicate(sequenceNode.Children[0]);
+            string? label = TryParseLabel(sequenceNode.Children[1]);
+            if (label != null)
+                pattern = LabelPattern.Create(label, pattern);
 
-            if (optional.Children.Count == 0)
-                return pattern;
-
-            var valueNode = (ValueNode)optional.Children[0];
-            string label = valueNode.Value[1..^1].Replace("''", "'");
-
-            return LabelPattern.Create(label, pattern);
+            return pattern;
         }
 
         private static IPattern BuildPredicate(IParseNode node)
