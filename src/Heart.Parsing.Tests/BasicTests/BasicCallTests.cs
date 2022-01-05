@@ -5,90 +5,90 @@ namespace Heart.Tests.BasicTests
     [TestFixture]
     public class BasicCallTests
     {
-        private static readonly BasicTestCase[] s_testCases = new BasicTestCase[]
+        private static readonly ExpressionTestCase[] s_testCases = new ExpressionTestCase[]
         {
             //Call
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "sin(a) + cos(b)",
-                ExpectedNodeString = "(+ ($ sin a) ($ cos b))",
+                ExpectedOutput = "(+ ($ sin a) ($ cos b))",
             },
             //CallExpressionParameter
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "tan(b + c)",
-                ExpectedNodeString = "($ tan (+ b c))",
+                ExpectedOutput = "($ tan (+ b c))",
             },
             //CallChained
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "sin(cos(b))",
-                ExpectedNodeString = "($ sin ($ cos b))",
+                ExpectedOutput = "($ sin ($ cos b))",
             },
             //CallMultiParameter
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "max(a,b) + min(b,c)",
-                ExpectedNodeString = "(+ ($ max a b) ($ min b c))",
+                ExpectedOutput = "(+ ($ max a b) ($ min b c))",
             },
             //CallMultiExpressionParameter
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "max(a + b, b + c)",
-                ExpectedNodeString = "($ max (+ a b) (+ b c))",
+                ExpectedOutput = "($ max (+ a b) (+ b c))",
             },
             //CallNestedMultiExpressionParameter
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "max((a + b) * 2, (b / c))",
-                ExpectedNodeString = "($ max (* (+ a b) 2) (/ b c))",
+                ExpectedOutput = "($ max (* (+ a b) 2) (/ b c))",
             },
             //CallChainedMultiParameter
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "max(min(c, b), max(c, a))",
-                ExpectedNodeString = "($ max ($ min c b) ($ max c a))",
+                ExpectedOutput = "($ max ($ min c b) ($ max c a))",
             },
             //CallChainedMultiParameterUnary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "max(min(c, b), +a)",
-                ExpectedNodeString = "($ max ($ min c b) (u+ a))",
+                ExpectedOutput = "($ max ($ min c b) (u+ a))",
             },
             //CallNestedExpressionParameter
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "sin(min(c, b) - a)",
-                ExpectedNodeString = "($ sin (- ($ min c b) a))",
+                ExpectedOutput = "($ sin (- ($ min c b) a))",
             },
             //PostfixInfixUnary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "clamp(a,b,c) + - d",
-                ExpectedNodeString = "(+ ($ clamp a b c) (u- d))",
+                ExpectedOutput = "(+ ($ clamp a b c) (u- d))",
             },
             //Postfix
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "clamp(a + b, b - c, c * d)",
-                ExpectedNodeString = "($ clamp (+ a b) (- b c) (* c d))",
+                ExpectedOutput = "($ clamp (+ a b) (- b c) (* c d))",
             },
             //UnaryCall
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "-max(2, b)",
-                ExpectedNodeString = "(u- ($ max 2 b))",
+                ExpectedOutput = "(u- ($ max 2 b))",
             },
             //EmptyCall
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "max()",
-                ExpectedNodeString = "($ max)",
+                ExpectedOutput = "($ max)",
             },
         };
 
         [TestCaseSource(nameof(s_testCases))]
-        public void TestCases(BasicTestCase testCase)
+        public void TestCases(ExpressionTestCase testCase)
         {
             testCase.Execute(Utility.Parser);
         }

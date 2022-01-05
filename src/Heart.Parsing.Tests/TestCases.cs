@@ -4,7 +4,7 @@ using NUnit.Framework;
 #pragma warning disable CS8618
 #pragma warning disable CS8625
 
-namespace Heart.Tests.ExpressionPatternTests
+namespace Heart.Tests
 {
     public interface IExpressionTestCase
     {

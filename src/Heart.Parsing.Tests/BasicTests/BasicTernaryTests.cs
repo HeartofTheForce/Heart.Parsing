@@ -5,54 +5,54 @@ namespace Heart.Tests.BasicTests
     [TestFixture]
     public class BasicTernaryTests
     {
-        private static readonly BasicTestCase[] s_testCases = new BasicTestCase[]
+        private static readonly ExpressionTestCase[] s_testCases = new ExpressionTestCase[]
         {
             //ChainedTernary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "a ? b : c ? d : e",
-                ExpectedNodeString = "(?: a b (?: c d e))",
+                ExpectedOutput = "(?: a b (?: c d e))",
             },
             //TernaryBrackets
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "(a ? b : c) ? d : e",
-                ExpectedNodeString = "(?: (?: a b c) d e)",
+                ExpectedOutput = "(?: (?: a b c) d e)",
             },
             //TernaryBinary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "a ? b : c + 1",
-                ExpectedNodeString = "(?: a b (+ c 1))",
+                ExpectedOutput = "(?: a b (+ c 1))",
             },
             //NestedTernary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "a ? b ? c : d : e",
-                ExpectedNodeString = "(?: a (?: b c d) e)",
+                ExpectedOutput = "(?: a (?: b c d) e)",
             },
             //InfixTernary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "a * b ? c : d",
-                ExpectedNodeString = "(?: (* a b) c d)",
+                ExpectedOutput = "(?: (* a b) c d)",
             },
             //PrefixTernary
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "-a ? b : c",
-                ExpectedNodeString = "(?: (u- a) b c)",
+                ExpectedOutput = "(?: (u- a) b c)",
             },
             //TernaryPostfix
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "a ? b : c!",
-                ExpectedNodeString = "(?: a b (! c))",
+                ExpectedOutput = "(?: a b (! c))",
             },
         };
 
         [TestCaseSource(nameof(s_testCases))]
-        public void TestCases(BasicTestCase testCase)
+        public void TestCases(ExpressionTestCase testCase)
         {
             testCase.Execute(Utility.Parser);
         }

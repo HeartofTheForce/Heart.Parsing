@@ -5,30 +5,30 @@ namespace Heart.Tests.BasicTests
     [TestFixture]
     public class BasicIntTests
     {
-        private static readonly BasicTestCase[] s_testCases = new BasicTestCase[]
+        private static readonly ExpressionTestCase[] s_testCases = new ExpressionTestCase[]
         {
             //ReturnDouble2Int
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "2.5 + 3.3",
-                ExpectedNodeString = "(+ 2.5 3.3)",
+                ExpectedOutput = "(+ 2.5 3.3)",
             },
             //IntOnlyBitwise
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "~(1 | 4)",
-                ExpectedNodeString = "(~ (| 1 4))",
+                ExpectedOutput = "(~ (| 1 4))",
             },
             //BinaryPostfix
-            new BasicTestCase()
+            new ExpressionTestCase()
             {
                 Infix = "2 * 1!",
-                ExpectedNodeString = "(* 2 (! 1))",
+                ExpectedOutput = "(* 2 (! 1))",
             },
         };
 
         [TestCaseSource(nameof(s_testCases))]
-        public void TestCases(BasicTestCase testCase)
+        public void TestCases(ExpressionTestCase testCase)
         {
             testCase.Execute(Utility.Parser);
         }

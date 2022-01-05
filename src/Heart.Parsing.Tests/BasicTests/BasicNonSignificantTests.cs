@@ -5,30 +5,30 @@ namespace Heart.Tests.BasicTests
     [TestFixture]
     public class BasicNonSignificantTests
     {
-        private static readonly BasicTestCase[] s_testCases = new BasicTestCase[]
+        private static readonly ExpressionTestCase[] s_testCases = new ExpressionTestCase[]
         {
-            //Leading Whitespace
-            new BasicTestCase()
+            //LeadingWhitespace
+            new ExpressionTestCase()
             {
                 Infix = " 1",
-                ExpectedNodeString = "1",
+                ExpectedOutput = "1",
             },
-            //Trailing Whitespace
-            new BasicTestCase()
+            //TrailingWhitespace
+            new ExpressionTestCase()
             {
                 Infix = "1 ",
-                ExpectedNodeString = "1",
+                ExpectedOutput = "1",
             },
-            //Expression Whitespace
-            new BasicTestCase()
+            //ExpressionWhitespace
+            new ExpressionTestCase()
             {
                 Infix = "1 + 2",
-                ExpectedNodeString = "(+ 1 2)",
+                ExpectedOutput = "(+ 1 2)",
             },
         };
 
         [TestCaseSource(nameof(s_testCases))]
-        public void TestCases(BasicTestCase testCase)
+        public void TestCases(ExpressionTestCase testCase)
         {
             testCase.Execute(Utility.Parser);
         }
