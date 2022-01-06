@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Heart.Parsing.Patterns;
 
 namespace Heart.Parsing
 {
@@ -29,17 +28,7 @@ namespace Heart.Parsing
                 Exception = ex;
         }
 
-        public void AssertComplete()
-        {
-            if (Offset != Input.Length)
-            {
-                LogException(new UnexpectedTokenException(Offset, "EOF"));
-                if (Exception != null)
-                    throw Exception;
-                else
-                    throw new ArgumentException(nameof(Exception));
-            }
-        }
+        public bool IsComplete() => Offset == Input.Length;
     }
 
     public abstract class PatternException : Exception

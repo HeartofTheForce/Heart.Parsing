@@ -24,11 +24,7 @@ namespace Heart.Parsing
             var ctx = new ParserContext(input);
 
             var pattern = QuantifierPattern.MinOrMore(1, LookupPattern.Create("rule")).Trim(pegParser.Patterns["_"]);
-            var result = pattern.TryMatch(pegParser, ctx);
-
-            ctx.AssertComplete();
-            if (result == null)
-                throw new ArgumentException(nameof(ctx.Exception));
+            var result = pattern.MatchComplete(pegParser, ctx);
 
             var output = new PatternParser();
             var rules = (QuantifierNode)result;

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Heart.Parsing.Patterns
@@ -28,13 +27,7 @@ namespace Heart.Parsing.Patterns
         public static IParseNode Parse(PatternParser parser, ParserContext ctx)
         {
             var pattern = parser.Patterns["expr"].Trim(parser.Patterns["_"]);
-            var result = pattern.TryMatch(parser, ctx);
-
-            ctx.AssertComplete();
-            if (result == null)
-                throw new ArgumentException(nameof(ctx.Exception));
-
-            return result;
+            return pattern.MatchComplete(parser, ctx);
         }
 
         public IParseNode? Match(PatternParser parser, ParserContext ctx)
