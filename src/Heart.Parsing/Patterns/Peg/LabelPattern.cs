@@ -20,7 +20,7 @@ namespace Heart.Parsing.Patterns
 
         public IParseNode? Match(PatternParser parser, ParserContext ctx)
         {
-            var result = _pattern.TryMatch(parser, ctx);
+            var result = _pattern.Match(parser, ctx);
 
             if (result != null)
                 return new LabelNode(_label, result);

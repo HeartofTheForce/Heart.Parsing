@@ -15,7 +15,7 @@ namespace Heart.Parsing.Patterns
         {
             _resetOffset = ctx.Offset;
             if (_cnt != 0)
-                parser.Patterns["_"].TryMatch(parser, ctx);
+                parser.Patterns["_"].Match(parser, ctx);
         }
 
         public void PostMatch(bool success, ParserContext ctx)

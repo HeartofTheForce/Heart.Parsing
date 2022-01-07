@@ -16,7 +16,7 @@ namespace Heart.Parsing.Patterns
 
         public IParseNode? Match(PatternParser parser, ParserContext ctx)
         {
-            var result = parser.Patterns[_key].TryMatch(parser, ctx);
+            var result = parser.Patterns[_key].Match(parser, ctx);
             return result;
         }
     }

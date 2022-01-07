@@ -51,7 +51,7 @@ namespace Heart.Parsing.Patterns
             foreach (var step in _steps)
             {
                 nonSignificantHelper.PreMatch(parser, ctx);
-                var result = step.Pattern.TryMatch(parser, ctx);
+                var result = step.Pattern.Match(parser, ctx);
                 nonSignificantHelper.PostMatch(result != null, ctx);
 
                 if (result == null)
