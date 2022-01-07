@@ -24,12 +24,6 @@ namespace Heart.Parsing.Patterns
             _haveOperandOperators = haveOperandOperators;
         }
 
-        public static IParseNode Parse(PatternParser parser, ParserContext ctx)
-        {
-            var pattern = parser.Patterns["expr"].Trim(parser.Patterns["_"]);
-            return pattern.MatchComplete(parser, ctx);
-        }
-
         public IParseNode? Match(PatternParser parser, ParserContext ctx)
         {
             var nodeBuilders = new Stack<ExpressionNodeBuilder>();

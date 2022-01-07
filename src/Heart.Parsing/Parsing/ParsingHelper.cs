@@ -23,7 +23,7 @@ namespace Heart.Parsing
             var pegParser = CreatePegParser();
             var ctx = new ParserContext(input);
 
-            var pattern = QuantifierPattern.MinOrMore(1, LookupPattern.Create("rule")).Trim(pegParser.Patterns["_"]);
+            var pattern = QuantifierPattern.MinOrMore(1, LookupPattern.Create("rule")).Trim();
             var result = pattern.MatchComplete(pegParser, ctx);
 
             var output = new PatternParser();

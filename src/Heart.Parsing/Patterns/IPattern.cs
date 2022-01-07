@@ -38,12 +38,12 @@ namespace Heart.Parsing.Patterns
             return result;
         }
 
-        public static IPattern Trim(this IPattern pattern, IPattern trimPattern)
+        public static IPattern Trim(this IPattern pattern)
         {
             return SequencePattern.Create()
-                .Discard(trimPattern)
+                .Discard(QuantifierPattern.Optional(LookupPattern.Create("_")))
                 .Then(pattern)
-                .Discard(trimPattern);
+                .Discard(QuantifierPattern.Optional(LookupPattern.Create("_")));
         }
     }
 }

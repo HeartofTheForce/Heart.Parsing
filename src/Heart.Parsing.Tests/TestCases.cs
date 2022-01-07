@@ -19,9 +19,10 @@ namespace Heart.Tests
         public void Execute(PatternParser parser)
         {
             var ctx = new ParserContext(Infix);
+            var pattern = parser.Patterns["expr"].Trim();
+            var result = pattern.MatchComplete(parser, ctx);
 
-            var node = ExpressionPattern.Parse(parser, ctx);
-            Assert.AreEqual(ExpectedOutput, StringCompiler.Compile(node));
+            Assert.AreEqual(ExpectedOutput, StringCompiler.Compile(result));
         }
 
         public override string ToString()
@@ -38,7 +39,8 @@ namespace Heart.Tests
         public void Execute(PatternParser parser)
         {
             var ctx = new ParserContext(Infix);
-            var ex = Assert.Throws<ExpressionTermException>(() => ExpressionPattern.Parse(parser, ctx));
+            var pattern = parser.Patterns["expr"].Trim();
+            var ex = Assert.Throws<ExpressionTermException>(() => pattern.MatchComplete(parser, ctx));
 
             Assert.AreEqual(ExpectedTextOffset, ex.TextOffset);
         }
@@ -58,7 +60,8 @@ namespace Heart.Tests
         public void Execute(PatternParser parser)
         {
             var ctx = new ParserContext(Infix);
-            var ex = Assert.Throws<UnexpectedTokenException>(() => ExpressionPattern.Parse(parser, ctx));
+            var pattern = parser.Patterns["expr"].Trim();
+            var ex = Assert.Throws<UnexpectedTokenException>(() => pattern.MatchComplete(parser, ctx));
 
             Assert.AreEqual(ExpectedTextOffset, ex.TextOffset);
             Assert.AreEqual(ExpectedPattern, ex.ExpectedPattern);
