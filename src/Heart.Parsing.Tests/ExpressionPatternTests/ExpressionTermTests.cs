@@ -7,49 +7,49 @@ namespace Heart.Tests.ExpressionPatternTests
     {
         private static readonly ExpressionTermTestCase[] s_testCases = new ExpressionTermTestCase[]
         {
-            //Empty Delimiter Close
+            //EmptyDelimiterClose
             new ExpressionTermTestCase()
             {
                 Infix = "max(1, 2, )",
                 ExpectedTextOffset = 10,
             },
-            //Empty Delimiter Delimiter
+            //EmptyDelimiterDelimiter
             new ExpressionTermTestCase()
             {
                 Infix = "max(1, ,3)",
                 ExpectedTextOffset = 7,
             },
-            //Empty Open Delimiter
+            //EmptyOpenDelimiter
             new ExpressionTermTestCase()
             {
                 Infix = "max( , 2, 3)",
                 ExpectedTextOffset = 5,
             },
-            //Empty Delimiter EndOfString
+            //EmptyDelimiterEndOfString
             new ExpressionTermTestCase()
             {
                 Infix = "max(1, 2, ",
                 ExpectedTextOffset = 10,
             },
-            //Empty Brackets
+            //EmptyBrackets
             new ExpressionTermTestCase()
             {
                 Infix = "()",
                 ExpectedTextOffset = 1,
             },
-            //Empty Binary Right
+            //EmptyBinaryRight
             new ExpressionTermTestCase()
             {
                 Infix = "1 +",
                 ExpectedTextOffset = 3,
             },
-            //Empty Unary Right
+            //EmptyUnaryRight
             new ExpressionTermTestCase()
             {
                 Infix = "-",
                 ExpectedTextOffset = 1,
             },
-            //Nested Empty Binary Right
+            //NestedEmptyBinaryRight
             new ExpressionTermTestCase()
             {
                 Infix = "(1 + ) 2",

@@ -7,84 +7,84 @@ namespace Heart.Tests.ExpressionPatternTests
     {
         private static readonly UnexpectedTokenTestCase[] s_testCases = new UnexpectedTokenTestCase[]
         {
-            //Constant Constant
+            //ConstantConstant
             new UnexpectedTokenTestCase()
             {
                 Infix = "1 1",
                 ExpectedTextOffset = 2,
                 ExpectedPattern = "EOF",
             },
-            //Identifier Constant
+            //IdentifierConstant
             new UnexpectedTokenTestCase()
             {
                 Infix = "a 1",
                 ExpectedTextOffset = 2,
                 ExpectedPattern = "EOF",
             },
-            //Constant Identifier
+            //ConstantIdentifier
             new UnexpectedTokenTestCase()
             {
                 Infix = "1 a",
                 ExpectedTextOffset = 2,
                 ExpectedPattern = "EOF",
             },
-            //Identifier Identifier
+            //IdentifierIdentifier
             new UnexpectedTokenTestCase()
             {
                 Infix = "a a",
                 ExpectedTextOffset = 2,
                 ExpectedPattern = "EOF",
             },
-            //RoundClose Identifier
+            //RoundCloseIdentifier
             new UnexpectedTokenTestCase()
             {
                 Infix = "(1) a",
                 ExpectedTextOffset = 4,
                 ExpectedPattern = "EOF",
             },
-            //RoundClose Constant
+            //RoundCloseConstant
             new UnexpectedTokenTestCase()
             {
                 Infix = "(a) 1",
                 ExpectedTextOffset = 4,
                 ExpectedPattern = "EOF",
             },
-            //Unexpected Close
+            //UnexpectedClose
             new UnexpectedTokenTestCase()
             {
                 Infix = "(1+2))",
                 ExpectedTextOffset = 5,
                 ExpectedPattern = "EOF",
             },
-            //Bracket Missing Close
+            //BracketMissingClose
             new UnexpectedTokenTestCase()
             {
                 Infix = "(1+2",
                 ExpectedTextOffset = 4,
                 ExpectedPattern = ")",
             },
-            //Call Missing Close
+            //CallMissingClose
             new UnexpectedTokenTestCase()
             {
                 Infix = "max(1,2",
                 ExpectedTextOffset = 7,
                 ExpectedPattern = ")",
             },
-            //Unexpected Comma
+            //UnexpectedComma
             new UnexpectedTokenTestCase()
             {
                 Infix = "(1,)",
                 ExpectedTextOffset = 2,
                 ExpectedPattern = ")",
             },
-            //Too Few Operands
+            //TooFewOperands
             new UnexpectedTokenTestCase()
             {
                 Infix = "a ? b",
                 ExpectedTextOffset = 5,
                 ExpectedPattern = ":",
             },
-            //Too Many Operands
+            //TooManyOperands
             new UnexpectedTokenTestCase()
             {
                 Infix = "a ? b : c : d",
