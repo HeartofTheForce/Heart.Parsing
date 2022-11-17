@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Heart.Parsing.Patterns;
 
 namespace Heart.Parsing
 {
@@ -24,33 +24,10 @@ namespace Heart.Parsing
         {
             _patternExceptions.Add(ex);
 
-            if (Exception == null || ex.TextOffset >= Exception.TextOffset && ex.Priority >= Exception.Priority)
+            if (Exception == null || ex.TextOffset > Exception.TextOffset || (ex.TextOffset == Exception.TextOffset && ex.Priority >= Exception.Priority))
                 Exception = ex;
         }
 
         public bool IsComplete() => Offset == Input.Length;
-    }
-
-    public abstract class PatternException : Exception
-    {
-        public int TextOffset { get; }
-        public int Priority { get; }
-
-        public PatternException(int textOffset, int priority, string message) : base(message)
-        {
-            TextOffset = textOffset;
-            Priority = priority;
-        }
-
-        public PatternException(int textOffset, string message) : this(textOffset, 0, message)
-        {
-        }
-    }
-
-    public class ZeroLengthMatchException : PatternException
-    {
-        public ZeroLengthMatchException(int textOffset) : base(textOffset, "Unexpected 0 length match")
-        {
-        }
     }
 }

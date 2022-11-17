@@ -10,6 +10,8 @@ namespace Heart.Parsing
         private static readonly TerminalPattern s_regex = TerminalPattern.FromRegex("`(?:``|[^`])*`");
         private static readonly TerminalPattern s_plainText = TerminalPattern.FromRegex("'(?:''|[^'])*'");
         private static readonly TerminalPattern s_identifier = TerminalPattern.FromRegex("[_a-zA-Z]\\w*");
+        private static readonly TerminalPattern s_digits = TerminalPattern.FromRegex("\\d+");
+        private static readonly TerminalPattern s_none = TerminalPattern.FromPlainText("none");
 
         private static IPattern Label(this IPattern pattern, string label)
         {
@@ -21,10 +23,8 @@ namespace Heart.Parsing
             string input = File.ReadAllText(path);
 
             var pegParser = CreatePegParser();
-            var ctx = new ParserContext(input);
-
             var pattern = QuantifierPattern.MinOrMore(1, LookupPattern.Create("rule")).Trim();
-            var result = pattern.MatchComplete(pegParser, ctx);
+            var result = pegParser.MatchComplete(pattern, input);
 
             var output = new PatternParser();
             var rules = (QuantifierNode)result;
@@ -125,16 +125,14 @@ namespace Heart.Parsing
                         .Label("parenthesis"))
                     .Or(s_identifier.Label("lookup")));
 
-            var digits = TerminalPattern.FromRegex("\\d+");
-            var none = TerminalPattern.FromPlainText("none");
             parser.Patterns["expr_head"] = SequencePattern.Create()
                 .Then(s_plainText)
                 .Then(ChoicePattern.Create()
-                    .Or(digits)
-                    .Or(none))
+                    .Or(s_digits)
+                    .Or(s_none))
                 .Then(ChoicePattern.Create()
-                    .Or(digits)
-                    .Or(none));
+                    .Or(s_digits)
+                    .Or(s_none));
 
             parser.Patterns["expr"] = SequencePattern.Create()
                 .Discard(TerminalPattern.FromPlainText("["))

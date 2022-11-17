@@ -68,18 +68,4 @@ namespace Heart.Parsing.Patterns
 
         public IEnumerable<IParseNode> GetChildren() => Enumerable.Empty<IParseNode>();
     }
-
-    public class UnexpectedTokenException : PatternException
-    {
-        public string ExpectedPattern { get; }
-
-        public UnexpectedTokenException(int textOffset, string expectedPattern) : base(textOffset, $"Unexpected Token @ {textOffset} expected {expectedPattern}")
-        {
-            ExpectedPattern = expectedPattern;
-        }
-
-        public UnexpectedTokenException(int textOffset, TerminalPattern terminalPattern) : this(textOffset, terminalPattern.ToString())
-        {
-        }
-    }
 }

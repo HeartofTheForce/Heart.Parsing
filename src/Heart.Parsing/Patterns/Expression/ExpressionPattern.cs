@@ -95,11 +95,4 @@ namespace Heart.Parsing.Patterns
             return left.RightPrecedence <= right.LeftPrecedence;
         }
     }
-
-    public class ExpressionTermException : PatternException
-    {
-        public ExpressionTermException(int textOffset) : base(textOffset, 1, $"Invalid Expression Term @ {textOffset}")
-        {
-        }
-    }
 }
