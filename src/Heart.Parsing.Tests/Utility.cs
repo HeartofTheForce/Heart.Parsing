@@ -1,5 +1,4 @@
 using Heart.Parsing;
-using Heart.Parsing.Patterns;
 
 namespace Heart.Tests
 {

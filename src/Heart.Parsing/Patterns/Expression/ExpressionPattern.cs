@@ -29,12 +29,12 @@ namespace Heart.Parsing.Patterns
             var nodeBuilders = new Stack<ExpressionNodeBuilder>();
             ExpressionNode? operand = null;
 
-            var nonSignificantHelper = new NonSignificantHelper();
+            var flowHelper = new FlowHelper();
             while (true)
             {
-                nonSignificantHelper.PreMatch(parser, ctx);
+                flowHelper.PreMatch(parser, ctx);
                 var right = TryGetNodeBuilder(operand == null, parser, ctx);
-                nonSignificantHelper.PostMatch(right != null, ctx);
+                flowHelper.PostMatch(right != null, ctx);
                 if (right == null)
                 {
                     if (operand == null)

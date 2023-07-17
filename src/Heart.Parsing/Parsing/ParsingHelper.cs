@@ -23,7 +23,7 @@ namespace Heart.Parsing
             string input = File.ReadAllText(path);
 
             var pegParser = CreatePegParser();
-            var pattern = QuantifierPattern.MinOrMore(1, LookupPattern.Create("rule")).Trim();
+            var pattern = LookupPattern.Create("rule").MinOrMore(1).Trim();
             var result = pegParser.MatchComplete(pattern, input);
 
             var output = new PatternParser();
@@ -59,11 +59,11 @@ namespace Heart.Parsing
         {
             var parser = new PatternParser();
 
-            parser.Patterns["_"] = QuantifierPattern.MinOrMore(
-                0,
+            parser.Patterns["_"] =
                 ChoicePattern.Create()
                     .Or(TerminalPattern.FromRegex("#.*"))
-                    .Or(TerminalPattern.FromRegex("\\s+")));
+                    .Or(TerminalPattern.FromRegex("\\s+"))
+                    .MinOrMore(0);
 
             parser.Patterns["rule"] = SequencePattern.Create()
                 .Then(LookupPattern.Create("rule_head"))
@@ -74,56 +74,58 @@ namespace Heart.Parsing
             parser.Patterns["rule_head"] = SequencePattern.Create()
                 .Then(s_identifier)
                 .Then(LookupPattern.Create("label"))
-                .Discard(TerminalPattern.FromPlainText("->"));
+                .Then(TerminalPattern.FromPlainText("->"));
 
             parser.Patterns["choice"] = SequencePattern.Create()
                 .Then(LookupPattern.Create("sequence"))
-                .Then(QuantifierPattern.MinOrMore(
-                    0,
-                    SequencePattern.Create()
-                        .Discard(TerminalPattern.FromPlainText("/"))
-                        .Then(LookupPattern.Create("sequence"))));
+                .Then(SequencePattern.Create()
+                    .Then(TerminalPattern.FromPlainText("/"))
+                    .Then(LookupPattern.Create("sequence"))
+                    .At(1)
+                    .MinOrMore(0));
 
-            parser.Patterns["sequence"] = QuantifierPattern.MinOrMore(
-                1,
-                SequencePattern.Create()
-                    .Then(LookupPattern.Create("predicate"))
-                    .Then(LookupPattern.Create("label")));
+            parser.Patterns["sequence"] = SequencePattern.Create()
+                .Then(LookupPattern.Create("predicate"))
+                .Then(LookupPattern.Create("label"))
+                .MinOrMore(1);
 
-            parser.Patterns["label"] = QuantifierPattern.Optional(
-                SequencePattern.Create()
-                    .Discard(TerminalPattern.FromPlainText(":"))
-                    .Then(s_plainText));
+            parser.Patterns["label"] = SequencePattern.Create()
+                .Then(TerminalPattern.FromPlainText(":"))
+                .Then(s_plainText)
+                .At(1)
+                .Optional();
 
             parser.Patterns["predicate"] = SequencePattern.Create()
-               .Then(QuantifierPattern.Optional(
-                    ChoicePattern.Create()
-                        .Or(TerminalPattern.FromPlainText("&"))
-                        .Or(TerminalPattern.FromPlainText("!"))))
+               .Then(ChoicePattern.Create()
+                    .Or(TerminalPattern.FromPlainText("&"))
+                    .Or(TerminalPattern.FromPlainText("!"))
+                    .Optional())
                 .Then(LookupPattern.Create("quantifier"));
 
             parser.Patterns["quantifier"] = SequencePattern.Create()
                 .Then(LookupPattern.Create("term"))
-                .Then(QuantifierPattern.Optional(
-                    ChoicePattern.Create()
-                        .Or(TerminalPattern.FromPlainText("?"))
-                        .Or(TerminalPattern.FromPlainText("*"))
-                        .Or(TerminalPattern.FromPlainText("+"))));
+                .Then(ChoicePattern.Create()
+                    .Or(TerminalPattern.FromPlainText("?"))
+                    .Or(TerminalPattern.FromPlainText("*"))
+                    .Or(TerminalPattern.FromPlainText("+"))
+                    .Optional());
 
             parser.Patterns["term"] = SequencePattern.Create()
-                .Discard(PredicatePattern.Negative(LookupPattern.Create("rule_head")))
-                .Discard(PredicatePattern.Negative(LookupPattern.Create("expr_head")))
+                .Then(PredicatePattern.Negative(LookupPattern.Create("rule_head")))
+                .Then(PredicatePattern.Negative(LookupPattern.Create("expr_head")))
                 .Then(ChoicePattern.Create()
                     .Or(ChoicePattern.Create()
                         .Or(s_regex)
                         .Or(s_plainText)
                         .Label("terminal"))
                     .Or(SequencePattern.Create()
-                        .Discard(TerminalPattern.FromPlainText("("))
+                        .Then(TerminalPattern.FromPlainText("("))
                         .Then(LookupPattern.Create("choice"))
-                        .Discard(TerminalPattern.FromPlainText(")"))
+                        .Then(TerminalPattern.FromPlainText(")"))
+                        .At(1)
                         .Label("parenthesis"))
-                    .Or(s_identifier.Label("lookup")));
+                    .Or(s_identifier.Label("lookup")))
+                .At(2);
 
             parser.Patterns["expr_head"] = SequencePattern.Create()
                 .Then(s_plainText)
@@ -135,13 +137,13 @@ namespace Heart.Parsing
                     .Or(s_none));
 
             parser.Patterns["expr"] = SequencePattern.Create()
-                .Discard(TerminalPattern.FromPlainText("["))
-                .Then(QuantifierPattern.MinOrMore(
-                    0,
-                    SequencePattern.Create()
-                        .Then(LookupPattern.Create("expr_head"))
-                        .Then(LookupPattern.Create("choice"))))
-                .Discard(TerminalPattern.FromPlainText("]"));
+                .Then(TerminalPattern.FromPlainText("["))
+                .Then(SequencePattern.Create()
+                    .Then(LookupPattern.Create("expr_head"))
+                    .Then(LookupPattern.Create("choice"))
+                    .MinOrMore(0))
+                .Then(TerminalPattern.FromPlainText("]"))
+                .At(1);
 
             return parser;
         }
@@ -232,9 +234,9 @@ namespace Heart.Parsing
             var valueNode = (ValueNode)optional.Children[0];
             switch (valueNode.Value)
             {
-                case "?": return QuantifierPattern.Optional(pattern);
-                case "*": return QuantifierPattern.MinOrMore(0, pattern);
-                case "+": return QuantifierPattern.MinOrMore(1, pattern);
+                case "?": return pattern.Optional();
+                case "*": return pattern.MinOrMore(0);
+                case "+": return pattern.MinOrMore(1);
                 default: throw new NotImplementedException();
             };
         }

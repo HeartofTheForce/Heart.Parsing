@@ -1,11 +1,11 @@
 namespace Heart.Parsing.Patterns
 {
-    public class NonSignificantHelper
+    public class FlowHelper
     {
         private int _resetOffset;
         private int _cnt;
 
-        public NonSignificantHelper()
+        public FlowHelper()
         {
             _resetOffset = 0;
             _cnt = 0;

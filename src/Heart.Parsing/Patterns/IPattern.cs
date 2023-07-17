@@ -1,5 +1,3 @@
-using System;
-
 namespace Heart.Parsing.Patterns
 {
     public interface IPattern
@@ -20,12 +18,28 @@ namespace Heart.Parsing.Patterns
             return result;
         }
 
+        public static QuantifierPattern MinOrMore(this IPattern pattern, int min)
+        {
+            return new QuantifierPattern(min, null, pattern);
+        }
+
+        public static QuantifierPattern Optional(this IPattern pattern)
+        {
+            return new QuantifierPattern(0, 1, pattern);
+        }
+
+        public static SequenceAtPattern At(this SequencePattern sequencePattern, int index)
+        {
+            return new SequenceAtPattern(sequencePattern, index);
+        }
+
         public static IPattern Trim(this IPattern pattern)
         {
             return SequencePattern.Create()
-                .Discard(QuantifierPattern.Optional(LookupPattern.Create("_")))
+                .Then(LookupPattern.Create("_").Optional())
                 .Then(pattern)
-                .Discard(QuantifierPattern.Optional(LookupPattern.Create("_")));
+                .Then(LookupPattern.Create("_").Optional())
+                .At(1);
         }
     }
 }

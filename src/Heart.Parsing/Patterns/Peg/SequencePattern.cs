@@ -1,15 +1,14 @@
-using System;
 using System.Collections.Generic;
 
 namespace Heart.Parsing.Patterns
 {
     public class SequencePattern : IPattern
     {
-        private readonly List<SequenceStep> _steps;
+        private readonly List<IPattern> _patterns;
 
         private SequencePattern()
         {
-            _steps = new List<SequenceStep>();
+            _patterns = new List<IPattern>();
         }
 
         public static SequencePattern Create()
@@ -19,61 +18,50 @@ namespace Heart.Parsing.Patterns
 
         public SequencePattern Then(IPattern pattern)
         {
-            _steps.Add(new SequenceStep()
-            {
-                Pattern = pattern,
-                Discard = false,
-            });
-
-            return this;
-        }
-
-        public SequencePattern Discard(IPattern pattern)
-        {
-            _steps.Add(new SequenceStep()
-            {
-                Pattern = pattern,
-                Discard = true,
-            });
-
+            _patterns.Add(pattern);
             return this;
         }
 
         public IParseNode? Match(PatternParser parser, ParserContext ctx)
         {
-            if (_steps.Count <= 1)
-                throw new Exception($"Expected > 1 {nameof(_steps)} found: {_steps.Count}");
-
             int localOffset = ctx.Offset;
 
-            var nonSignificantHelper = new NonSignificantHelper();
+            var flowHelper = new FlowHelper();
             var output = new List<IParseNode>();
-            foreach (var step in _steps)
+            foreach (var pattern in _patterns)
             {
-                nonSignificantHelper.PreMatch(parser, ctx);
-                var result = step.Pattern.Match(parser, ctx);
-                nonSignificantHelper.PostMatch(result != null, ctx);
+                flowHelper.PreMatch(parser, ctx);
+                var result = pattern.Match(parser, ctx);
+                flowHelper.PostMatch(result != null, ctx);
 
                 if (result == null)
                     return null;
 
-                if (!step.Discard)
-                    output.Add(result);
+                output.Add(result);
             }
 
-            if (output.Count == 0)
-                throw new Exception($"Cannot {nameof(Discard)} all steps");
+            return new SequenceNode(localOffset, output);
+        }
+    }
 
-            if (output.Count == 1)
-                return output[0];
-            else
-                return new SequenceNode(localOffset, output);
+    public class SequenceAtPattern : IPattern
+    {
+        private readonly SequencePattern _pattern;
+        private readonly int _index;
+
+        public SequenceAtPattern(SequencePattern pattern, int index)
+        {
+            _pattern = pattern;
+            _index = index;
         }
 
-        private struct SequenceStep
+        public IParseNode? Match(PatternParser parser, ParserContext ctx)
         {
-            public IPattern Pattern { get; set; }
-            public bool Discard { get; set; }
+            var result = _pattern.Match(parser, ctx);
+            if (result != null)
+                return ((SequenceNode)result).Children[_index];
+
+            return null;
         }
     }
 
