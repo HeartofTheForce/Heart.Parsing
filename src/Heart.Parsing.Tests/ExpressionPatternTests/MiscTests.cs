@@ -14,7 +14,7 @@ namespace Heart.Tests.ExpressionPatternTests
         {
             var pattern = s_parser.Patterns["exception_priority"];
             var ex = Assert.Throws<UnexpectedTokenException>(() => s_parser.MatchComplete(pattern, "[[]"));
-            Assert.AreEqual(3, ex.TextOffset);
+            Assert.AreEqual(3, ex?.TextOffset);
         }
     }
 }

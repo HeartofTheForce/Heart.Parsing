@@ -26,7 +26,7 @@ namespace Heart.Parsing
             var pattern = LookupPattern.Create("rule").MinOrMore(1).Trim();
             var result = pegParser.MatchComplete(pattern, input);
 
-            var output = new PatternParser();
+            var parser = new PatternParser();
             var rules = (QuantifierNode)result;
             foreach (var child in rules.Children)
             {
@@ -45,14 +45,13 @@ namespace Heart.Parsing
                     default: throw new NotImplementedException();
                 }
 
-                string? label = TryParseLabel(ruleHeadNode.Children[1]);
-                if (label != null)
+                if (TryParseLabel(ruleHeadNode.Children[1], out string? label))
                     rulePattern = LabelPattern.Create(label, rulePattern);
 
-                output.Patterns[ruleName] = rulePattern;
+                parser.Patterns[ruleName] = rulePattern;
             }
 
-            return output;
+            return parser;
         }
 
         private static PatternParser CreatePegParser()
@@ -148,14 +147,18 @@ namespace Heart.Parsing
             return parser;
         }
 
-        private static string? TryParseLabel(IParseNode node)
+        private static bool TryParseLabel(IParseNode node, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? label)
         {
             var optional = (QuantifierNode)node;
             if (optional.Children.Count == 0)
-                return null;
+            {
+                label = null;
+                return false;
+            }
 
             var valueNode = (ValueNode)optional.Children[0];
-            return valueNode.Value[1..^1].Replace("''", "'");
+            label = valueNode.Value[1..^1].Replace("''", "'");
+            return true;
         }
 
         private static IPattern BuildChoice(IParseNode node)
@@ -197,8 +200,7 @@ namespace Heart.Parsing
         {
             var sequenceNode = (SequenceNode)node;
             var pattern = BuildPredicate(sequenceNode.Children[0]);
-            string? label = TryParseLabel(sequenceNode.Children[1]);
-            if (label != null)
+            if (TryParseLabel(sequenceNode.Children[1], out string? label))
                 pattern = LabelPattern.Create(label, pattern);
 
             return pattern;
