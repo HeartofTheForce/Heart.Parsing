@@ -49,7 +49,7 @@ namespace demo
 _ -> `\s*`
 
 # Root rule
-# Sequence of open square bracker, expression, close square bracket
+# Sequence of open square bracket, expression, close square bracket
 # Uses '' to indicate plain text
 root -> '[' expr ']'
 
